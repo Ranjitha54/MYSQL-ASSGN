@@ -1,0 +1,122 @@
+-- Create the database
+CREATE DATABASE ecommerce;
+
+--create the customers table
+CREATE TABLE customers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    address VARCHAR(200) NOT NULL
+);
+
+--Create the products table
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    productname VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    description TEXT
+);
+
+--Create the orders table
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL (10, 2) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+
+);
+
+--Create the order_items table.
+CREATE TABLE order_items (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   order_id INT,
+   product_id INT,
+   FOREIGN KEY (order_id) REFERENCES orders(id),
+   FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+--Insert the sample values to customers.
+INSERT INTO customers(name,email,address)VALUES
+ ("Ranjitha","ranjitha@gmail.com","123 main road"),
+ ("Suresh","suresh@gmail.com","456 main road"),
+ ("Annu","annu@gmail.com","879 cross road");
+
+ --Insert the sample values to orders.
+INSERT INTO orders(customer_id, order_date,total_amount)VALUES
+ (1,'2024-08-15 10:00:00',499.99),
+ (1,'2024-09-10 10:00:00',99.99),
+ (2,'2024-09-16 10:00:00',79.99),
+ (3,'2024-10-07 10:00:00',79.99);
+
+--Insert the sample values to products.
+ INSERT INTO products(productname, price,description)VALUES
+  ('PRODUCT A', 19.99," Description of Product A"),
+  ('PRODUCT B', 29.99," Description of Product B"),
+  ('PRODUCT C', 29.99," Description of Product C"),
+  ('PRODUCT D', 499.99," Description of Product D"),
+  ('PRODUCT E', 599.99," Description of Product E"),
+  ('PRODUCT F', 999.99," Description of Product F");
+
+--Insert the sample values to order_items.
+  INSERT INTO order_items (order_id, product_id) VALUES
+  (1, 1),
+  (1, 2),
+  (2, 3);
+
+  
+--Retrieve all customers who have placed an order in the last 30 days
+ SELECT DISTINCT c.name,o.order_date
+ FROM customers c
+ JOIN orders o ON c.id = o.id 
+ WHERE o.order_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+
+--Get the total amount of all orders placed by each customers.
+ SELECT c.id,o.id,c.name,o.total_amount
+ FROM customers c
+ join orders o on c.id = o.id;
+
+--Update the price of product C to 45.00.
+UPDATE PRODUCTS
+SET PRICE = "45.00"
+WHERE productname = "PRODUCT C";
+SELECT * FROM PRODUCTS;
+
+--Add a new column discount to the products table.
+ALTER TABLE PRODUCTS
+ADD DISCOUNT VARCHAR(15);
+SELECT * FROM PRODUCTS; 
+
+--Retrieve the top 3 products with the highest price.
+  
+  SELECT * from products order by price desc limit 3;
+
+--Get the names of customers who have ordered Product A
+
+ SELECT c.id,p.id,c.name,p.productname
+ FROM customers c
+ JOIN products p on c.id = p.id
+ AND productname = "product A";
+
+
+--Join the orders and customers tables to retrieve the customer's name and orderdate for each order.
+
+SELECT c.name,o.order_date
+FROM customers c
+INNER JOIN orders  o on c.id=o.id;
+
+
+--Retrieve the orders with a total amount greater than 150.00.
+
+  SELECT * FROM orders where total_amount >150;
+
+
+--Normalize the database by creating a separate table for order items and updating the orders table to reference the order_items table.
+
+  SELECT * FROM order_items;
+
+
+--Retrieve the average total  of all orders
+ 
+  SELECT avg(total_amount) FROM orders;
+ 
